@@ -1,0 +1,5 @@
+{
+  "loop_interval_seconds": 120,
+  "target_slot": 13,
+  "keybind": "P"
+}
