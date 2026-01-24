@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "spawner_auto_collect",
+  "version": "1.0.0",
+  "name": "Spawner Auto Collect",
+  "description": "This mod will collect the drops of Modded mob spawners in Minecraft.",
+  "authors": ["TheFusionCube"],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.thefusioncube.spawnerautocollect.SpawnerAutoCollectMod"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "fabric-api": "*",
+    "minecraft": "1.21.1"
+  }
+}
