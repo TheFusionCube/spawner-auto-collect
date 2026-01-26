@@ -3,16 +3,13 @@
   "id": "spawner_auto_collect",
   "version": "1.0.0",
   "name": "Spawner Auto Collect",
-  "description": "Automatically collects drops from spawners.",
+  "description": "Automatically collects items from spawner GUI",
   "authors": ["TheFusionCube"],
+  "contact": {},
   "license": "MIT",
-
-  "environment": "*",
+  "environment": "client",
 
   "entrypoints": {
-    "main": [
-      "com.thefusioncube.spawnerautocollect.SpawnerAutoCollectMod"
-    ],
     "client": [
       "com.thefusioncube.spawnerautocollect.client.SpawnerAutoCollectClient"
     ]
@@ -20,7 +17,7 @@
 
   "depends": {
     "fabricloader": ">=0.15.0",
-    "fabric-api": "*",
-    "minecraft": "1.21.1"
+    "minecraft": "1.21.1",
+    "fabric-api": "*"
   }
 }
