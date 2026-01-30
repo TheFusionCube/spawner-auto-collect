@@ -1,5 +1,7 @@
-[04:38:23] [main/INFO] (FabricLoader/GameProvider) Loading Minecraft 1.21.1 with Fabric Loader 0.15.11
-[04:38:24] [main/INFO] (FabricLoader) Loading 55 mods:
+[03:40:35] [main/INFO] (FabricLoader/GameProvider) Loading Minecraft 1.21.1 with Fabric Loader 0.15.11
+[03:40:36] [main/INFO] (FabricLoader) Loading 58 mods:
+	- cloth-basic-math 0.6.1
+	- cloth-config 15.0.127
 	- fabric-api 0.102.1+1.21.1
 	- fabric-api-base 0.4.42+6573ed8c6a
 	- fabric-api-lookup-api-v1 1.6.68+b55973446a
@@ -24,7 +26,7 @@
 	- fabric-gametest-api-v1 2.0.4+6fc22b996a
 	- fabric-item-api-v1 11.0.0+afdfc9216a
 	- fabric-item-group-api-v1 4.1.4+780172706a
-	- fabric-key-binding-api-v1 1.0.47+0af3f5a76a
+	- fabric-key-binding-api-v1 1.0.47+0af3f5a790
 	- fabric-keybindings-v0 0.2.45+df3654b36a
 	- fabric-lifecycle-events-v1 2.3.12+6c1df3606a
 	- fabric-loot-api-v2 3.0.14+3f89f5a56a
@@ -54,15 +56,18 @@
 	- java 21
 	- minecraft 1.21.1
 	- mixinextras 0.3.5
-	- spawner_auto_collect 1.0.0
-[04:38:24] [main/INFO] (FabricLoader/Mixin) SpongePowered MIXIN Subsystem Version=0.8.5 Source=file:/home/codespace/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.13.3+mixin.0.8.5/9527e6b0d2449408958fd1302594dc65ec5ade9c/sponge-mixin-0.13.3+mixin.0.8.5.jar Service=Knot/Fabric Env=CLIENT
-[04:38:24] [main/INFO] (FabricLoader/Mixin) Loaded Fabric development mappings for mixin remapper!
-[04:38:24] [main/INFO] (FabricLoader/Mixin) Compatibility level set to JAVA_17
-[04:38:24] [main/INFO] (FabricLoader/Mixin) Compatibility level set to JAVA_21
-[04:38:27] [main/INFO] (FabricLoader/MixinExtras|Service) Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.3.5).
-[04:38:30] [Datafixer Bootstrap/INFO] (Minecraft) 226 Datafixer optimizations took 1121 milliseconds
-[04:38:40] [Render thread/INFO] (Minecraft) Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
-[04:38:40] [Render thread/INFO] (Minecraft) Setting user: Player233
-[04:38:40] [Render thread/INFO] (spawner_auto_collect) Spawner Auto Collect loaded!
-[04:38:41] [Render thread/INFO] (Indigo) [Indigo] Registering Indigo renderer!
-[04:38:42] [Render thread/INFO] (Minecraft) Backend library: LWJGL version 3.3.3-snapshot
+	- modmenu 11.0.1
+	- spawnerautocollect 1.0.0
+[03:40:36] [main/INFO] (FabricLoader/Mixin) SpongePowered MIXIN Subsystem Version=0.8.5 Source=file:/home/codespace/.gradle/caches/modules-2/files-2.1/net.fabricmc/sponge-mixin/0.13.3+mixin.0.8.5/9527e6b0d2449408958fd1302594dc65ec5ade9c/sponge-mixin-0.13.3+mixin.0.8.5.jar Service=Knot/Fabric Env=CLIENT
+[03:40:37] [main/INFO] (FabricLoader/Mixin) Loaded Fabric development mappings for mixin remapper!
+[03:40:37] [main/INFO] (FabricLoader/Mixin) Compatibility level set to JAVA_17
+[03:40:37] [main/INFO] (FabricLoader/Mixin) Compatibility level set to JAVA_21
+[03:40:39] [main/INFO] (FabricLoader/MixinExtras|Service) Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.3.5).
+[03:40:42] [Datafixer Bootstrap/INFO] (Minecraft) 226 Datafixer optimizations took 1071 milliseconds
+[03:40:54] [Render thread/INFO] (Minecraft) Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, name=PROD]
+[03:40:54] [Render thread/INFO] (Minecraft) Setting user: Player483
+[03:40:54] [Render thread/INFO] (spawner_auto_collect) Spawner Auto Collect loaded!
+[03:40:54] [Render thread/INFO] (Mod Menu/Update Checker) Checking mod updates...
+[03:40:55] [Render thread/INFO] (Indigo) [Indigo] Registering Indigo renderer!
+[03:40:55] [ModMenu/Update Checker/Fabric Loader/INFO] (Mod Menu/Update Checker) Update available for 'fabricloader@0.15.11'
+[03:40:56] [Render thread/INFO] (Minecraft) Backend library: LWJGL version 3.3.3-snapshot

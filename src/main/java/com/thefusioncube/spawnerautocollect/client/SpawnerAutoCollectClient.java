@@ -3,19 +3,20 @@ package com.thefusioncube.spawnerautocollect.client;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
-
 import org.lwjgl.glfw.GLFW;
 
 public class SpawnerAutoCollectClient implements ClientModInitializer {
@@ -24,7 +25,11 @@ public class SpawnerAutoCollectClient implements ClientModInitializer {
     private static boolean enabled = false;
 
     private static long lastRun = 0;
-    private static final long INTERVAL = 120_000; // 2 minutes
+
+    private static int step = 0;
+    private static int delayTicks = 0;
+
+    private static boolean lastScreenWasConfig = false;
 
     @Override
     public void onInitializeClient() {
@@ -36,81 +41,140 @@ public class SpawnerAutoCollectClient implements ClientModInitializer {
                 "Spawner Auto Collect"
         ));
 
+        // 🔴 Auto-disable when disconnecting from a world or server
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+            enabled = false;
+            step = 0;
+            delayTicks = 0;
+
+            if (client.player != null) {
+                client.player.sendMessage(Text.literal("§cSpawner Auto Collect disabled (disconnected)."), false);
+            }
+        });
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (toggleKey.wasPressed()) {
-                enabled = !enabled;
-                System.out.println("[SpawnerAutoCollect] " + (enabled ? "ENABLED" : "DISABLED"));
+
+            Screen current = client.currentScreen;
+
+            // Detect Cloth Config open
+            if (current != null && current.getClass().getName().contains("ClothConfigScreen")) {
+                lastScreenWasConfig = true;
             }
 
-            if (!enabled || client.player == null || client.world == null) return;
+            // Reload config after closing ClothConfig
+            if (current == null && lastScreenWasConfig) {
+                ConfigManager.reload();
+                lastScreenWasConfig = false;
 
-            if (System.currentTimeMillis() - lastRun < INTERVAL) return;
-            lastRun = System.currentTimeMillis();
+                if (client.player != null) {
+                    client.player.sendMessage(Text.literal("§aSpawner Auto Collect config reloaded."), true);
+                }
+            }
 
-            runSequence(client);
+            // Toggle key
+            while (toggleKey.wasPressed()) {
+                enabled = !enabled;
+                delayTicks = 0;
+                step = 0;
+
+                if (client.player != null) {
+                    client.player.sendMessage(
+                            Text.literal("Spawner Auto Collect: " +
+                                    (enabled ? "§aENABLED" : "§cDISABLED")),
+                            true
+                    );
+                }
+            }
+
+            if (!enabled || client.player == null) return;
+
+            if (delayTicks > 0) {
+                delayTicks--;
+                return;
+            }
+
+            if (step == 0 && !isIntervalReady()) return;
+
+            runSteps(client);
         });
     }
 
-    private void runSequence(MinecraftClient client) {
+    private static long getIntervalMs() {
+        return ConfigManager.get().loop_interval_seconds * 1000L;
+    }
+
+    private static boolean isIntervalReady() {
+        return (System.currentTimeMillis() - lastRun) >= getIntervalMs();
+    }
+
+    private void runSteps(MinecraftClient client) {
+
         ClientPlayerEntity player = client.player;
 
-        // 1. Right click block in front
-        if (client.crosshairTarget instanceof BlockHitResult blockHit) {
-            client.interactionManager.interactBlock(
-                    player,
-                    Hand.MAIN_HAND,
-                    blockHit
-            );
-        }
+        switch (step) {
 
-        // Delay a little using thread (simple approach)
-        new Thread(() -> {
-            try {
-                Thread.sleep(300);
+            case 0 -> {
+                if (client.crosshairTarget instanceof BlockHitResult hit) {
+                    client.interactionManager.interactBlock(player, Hand.MAIN_HAND, hit);
+                    step++;
+                    delayTicks = 10;
+                }
+            }
 
-                client.execute(() -> {
+            case 1 -> {
+                if (client.currentScreen instanceof HandledScreen<?> screen) {
+                    ScreenHandler handler = screen.getScreenHandler();
 
-                    // 2. Click slot 13 if GUI open
-                    if (client.currentScreen instanceof HandledScreen<?> screen) {
-                        ScreenHandler handler = screen.getScreenHandler();
+                    client.interactionManager.clickSlot(
+                            handler.syncId,
+                            ConfigManager.get().target_slot,
+                            0,
+                            SlotActionType.PICKUP,
+                            player
+                    );
 
-                        if (handler.slots.size() > 13) {
+                    step++;
+                    delayTicks = 10;
+                }
+            }
+
+            case 2 -> {
+                player.networkHandler.sendChatCommand("sell");
+                step++;
+                delayTicks = 10;
+            }
+
+            case 3 -> {
+                if (client.currentScreen instanceof HandledScreen<?> screen) {
+
+                    ScreenHandler handler = screen.getScreenHandler();
+                    int start = handler.slots.size() - 36;
+
+                    for (int i = start; i < handler.slots.size(); i++) {
+                        Slot slot = handler.slots.get(i);
+
+                        if (slot.hasStack() && slot.getStack().isOf(Items.ARROW)) {
+
                             client.interactionManager.clickSlot(
                                     handler.syncId,
-                                    13,
+                                    i,
                                     0,
-                                    net.minecraft.screen.slot.SlotActionType.PICKUP,
+                                    SlotActionType.QUICK_MOVE,
                                     player
                             );
                         }
-
-                        // 3. Run /sell
-                        player.networkHandler.sendChatCommand("sell");
-
-                        // 4. Move all arrows into container
-                        PlayerInventory inv = player.getInventory();
-
-                        for (int i = 0; i < inv.size(); i++) {
-                            Slot slot = handler.getSlot(i);
-                            if (slot.hasStack() &&
-                                    slot.getStack().getName().getString().toLowerCase().contains("arrow")) {
-
-                                client.interactionManager.clickSlot(
-                                        handler.syncId,
-                                        i,
-                                        0,
-                                        net.minecraft.screen.slot.SlotActionType.QUICK_MOVE,
-                                        player
-                                );
-                            }
-                        }
-
-                        // 5. Close GUI
-                        player.closeHandledScreen();
                     }
-                });
 
-            } catch (InterruptedException ignored) {}
-        }).start();
+                    step++;
+                    delayTicks = 10;
+                }
+            }
+
+            case 4 -> {
+                player.closeHandledScreen();
+                lastRun = System.currentTimeMillis();
+                step = 0;
+            }
+        }
     }
 }
